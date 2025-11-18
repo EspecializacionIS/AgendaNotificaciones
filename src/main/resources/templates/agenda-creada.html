@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <body>
+    <p>Hola <b th:text="${pacienteNombre}">Paciente</b>,</p>
+    <p>Tu cita ha sido <b>programada</b>:</p>
+    <ul>
+      <li><b>Médico:</b> <span th:text="${medicoNombre}">Dr/a</span></li>
+      <li><b>Fecha/Hora inicio:</b> <span th:text="${inicio}">2025-11-15 14:00</span></li>
+      <li><b>Fecha/Hora fin:</b> <span th:text="${fin}">2025-11-15 14:30</span></li>
+      <li><b>Motivo:</b> <span th:text="${motivo}">Consulta</span></li>
+    </ul>
+    <p>Si no puedes asistir, por favor responde a este correo para reprogramar.</p>
+    <p>— Clínica XYZ</p>
+  </body>
+</html>

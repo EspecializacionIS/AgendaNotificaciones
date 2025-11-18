@@ -1,18 +1,20 @@
 package com.clinic.agenda.api.dto;
 
-import com.clinic.agenda.domain.model.AgendaEstado;
+import lombok.*;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record AgendaResponse(
-        UUID id,
-        UUID medicoId,
-        String medicoNombre,
-        UUID pacienteId,
-        String pacienteNombre,
-        OffsetDateTime inicio,
-        OffsetDateTime fin,
-        AgendaEstado estado,
-        String motivo,
-        String notas
-) {}
+import com.clinic.agenda.domain.model.AgendaEstado;
+
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class AgendaResponse {
+    private UUID id;
+    private UUID medicoId;
+    private UUID pacienteId;
+    private OffsetDateTime inicio;
+    private OffsetDateTime fin;
+    private String motivo;
+    private String notas;
+    private AgendaEstado estado;
+}
