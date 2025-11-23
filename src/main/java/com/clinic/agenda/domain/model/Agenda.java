@@ -30,4 +30,16 @@ public class Agenda {
 
     private String motivo;
     private String notas;
+
+public void cambiarEstado(AgendaEstado nuevoEstado) {
+        if (this.estado == AgendaEstado.CANCELADA || this.estado == AgendaEstado.NO_ASISTIO) {
+            throw new IllegalStateException("No se puede cambiar el estado de una cita cancelada o marcada como no asistida.");
+        }
+
+        if (this.estado == AgendaEstado.ATENDIDA && nuevoEstado != AgendaEstado.ATENDIDA) {
+            throw new IllegalStateException("Una cita atendida no puede volver a otro estado.");
+        }
+    this.estado = nuevoEstado;
+    }
+
 }

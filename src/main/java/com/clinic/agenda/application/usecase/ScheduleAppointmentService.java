@@ -9,6 +9,9 @@ import com.clinic.agenda.application.port.out.notification.SendEmailPort;
 import com.clinic.agenda.domain.model.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 
 import java.util.UUID;
 
@@ -39,6 +42,13 @@ public class ScheduleAppointmentService implements ScheduleAppointmentUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Médico no encontrado"));
         var paciente = loadPaciente.findById(req.getPacienteId())
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado"));
+        
+        OffsetDateTime ahora = OffsetDateTime.now(ZoneOffset.UTC);
+        if (req.getInicio().isBefore(ahora)) {
+        throw new IllegalArgumentException("La cita no puede programarse en el pasado.");
+            }
+
+         validarDentroHorarioMedico(req, medico);
 
         if (!req.getInicio().isBefore(req.getFin()))
             throw new IllegalArgumentException("inicio < fin requerido");
@@ -71,4 +81,29 @@ public class ScheduleAppointmentService implements ScheduleAppointmentUseCase {
 
         return a.getId();
     }
+
+private void validarDentroHorarioMedico(AgendaCreateRequest req, Medico medico) {
+    LocalTime inicioJornada = medico.getJornadaInicio();
+    LocalTime finJornada = medico.getJornadaFin();
+
+    if (inicioJornada == null || finJornada == null) {
+        throw new IllegalArgumentException("El médico no tiene configurado su horario laboral.");
+    }
+
+    // Tomamos solo la hora de la cita (parte de tiempo)
+    LocalTime horaInicioCita = req.getInicio().toLocalTime();
+    LocalTime horaFinCita = req.getFin().toLocalTime();
+
+    boolean empiezaAntesDeJornada = horaInicioCita.isBefore(inicioJornada);
+    boolean terminaDespuesDeJornada = horaFinCita.isAfter(finJornada);
+
+    if (empiezaAntesDeJornada || terminaDespuesDeJornada) {
+        throw new IllegalArgumentException(
+                "La cita debe estar dentro del horario laboral del médico: "
+                        + inicioJornada + " - " + finJornada
+        );
+    }
+}
+
+
 }

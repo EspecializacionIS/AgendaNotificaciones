@@ -9,12 +9,13 @@ import com.clinic.agenda.domain.model.AgendaEstado;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class AgendaResponse {
-    private UUID id;
-    private UUID medicoId;
-    private UUID pacienteId;
-    private OffsetDateTime inicio;
-    private OffsetDateTime fin;
-    private String motivo;
-    private String notas;
-    private AgendaEstado estado;
+    UUID id;
+    UUID medicoId;
+    UUID pacienteId;
+    OffsetDateTime inicio;
+    OffsetDateTime fin;
+    AgendaEstado estado;
+    String motivo;
+    String notas;
+    
 }

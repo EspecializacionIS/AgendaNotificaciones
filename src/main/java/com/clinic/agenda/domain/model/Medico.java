@@ -28,4 +28,12 @@ public class Medico {
 
     @Column(nullable=false)
     private Boolean activo = true;
+
+    public LocalTime getJornadaInicio() {
+    return jornadaInicio;
+}
+
+public LocalTime getJornadaFin() {
+    return jornadaFin;
+}
 }
