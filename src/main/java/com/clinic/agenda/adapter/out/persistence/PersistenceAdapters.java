@@ -86,13 +86,21 @@ class AgendaPersistenceAdapter implements SaveAgendaPort, CheckOverlapPort, Load
         }
 
         if (fecha != null) {
-            ZoneId zone = ZoneId.of("America/Bogota");
-            ZonedDateTime zdtInicio = fecha.atStartOfDay(zone);
-           OffsetDateTime inicioDia = fecha.atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime finDia = inicioDia.plusDays(1);
+    // Zona horaria local de la clínica
+    ZoneId zone = ZoneId.of("America/Bogota");
 
-        predicates.add(cb.greaterThanOrEqualTo(root.get("inicio"), inicioDia));
-        predicates.add(cb.lessThan(root.get("inicio"), finDia));
+    // Inicio del día en hora local
+    ZonedDateTime zdtInicioLocal = fecha.atStartOfDay(zone);
+
+    // Fin del día (24 horas después)
+    ZonedDateTime zdtFinLocal = zdtInicioLocal.plusDays(1);
+
+    // Convertimos a OffsetDateTime en UTC SOLO para comparar en BD
+    OffsetDateTime inicioDiaUTC = zdtInicioLocal.toInstant().atOffset(ZoneOffset.UTC);
+    OffsetDateTime finDiaUTC = zdtFinLocal.toInstant().atOffset(ZoneOffset.UTC);
+
+    predicates.add(cb.greaterThanOrEqualTo(root.get("inicio"), inicioDiaUTC));
+    predicates.add(cb.lessThan(root.get("inicio"), finDiaUTC));
         }
 
         if (estado != null) {
