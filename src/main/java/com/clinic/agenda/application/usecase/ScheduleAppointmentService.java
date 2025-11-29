@@ -6,13 +6,14 @@ import com.clinic.agenda.application.port.out.agenda.*;
 import com.clinic.agenda.application.port.out.medico.LoadMedicoPort;
 import com.clinic.agenda.application.port.out.paciente.LoadPacientePort;
 import com.clinic.agenda.application.port.out.notification.SendEmailPort;
+import com.clinic.agenda.application.port.out.usuario.UsersGateway;
 import com.clinic.agenda.domain.model.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,17 +24,20 @@ public class ScheduleAppointmentService implements ScheduleAppointmentUseCase {
     private final SaveAgendaPort saveAgenda;
     private final CheckOverlapPort checkOverlap;
     private final SendEmailPort sendEmail;
+    private final UsersGateway usersGateway;
 
     public ScheduleAppointmentService(LoadMedicoPort loadMedico,
                                       LoadPacientePort loadPaciente,
                                       SaveAgendaPort saveAgenda,
                                       CheckOverlapPort checkOverlap,
-                                      SendEmailPort sendEmail) {
+                                      SendEmailPort sendEmail,
+                                      UsersGateway usersGateway) {
         this.loadMedico = loadMedico;
         this.loadPaciente = loadPaciente;
         this.saveAgenda = saveAgenda;
         this.checkOverlap = checkOverlap;
         this.sendEmail = sendEmail;
+        this.usersGateway = usersGateway;
     }
 
     @Override @Transactional
@@ -42,6 +46,16 @@ public class ScheduleAppointmentService implements ScheduleAppointmentUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Médico no encontrado"));
         var paciente = loadPaciente.findById(req.getPacienteId())
                 .orElseThrow(() -> new IllegalArgumentException("Paciente no encontrado"));
+
+        var userInfo = usersGateway.getUserByUsername(medico.getCognitoUsername());
+
+        if (userInfo == null || !userInfo.getEnabled()) {
+            throw new IllegalArgumentException("El médico no está activo en Cognito");
+        }
+
+        if (!userInfo.getGroups().contains("doctor")) {
+            throw new IllegalArgumentException("El médico no pertenece al grupo doctor");
+        }
         
         OffsetDateTime ahora = OffsetDateTime.now(ZoneOffset.UTC);
         if (req.getInicio().isBefore(ahora)) {

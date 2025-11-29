@@ -29,6 +29,9 @@ public class Medico {
     @Column(nullable=false)
     private Boolean activo = true;
 
+    @Column(name = "cognito_username", nullable = false, length = 160)
+    private String cognitoUsername;
+
     public LocalTime getJornadaInicio() {
     return jornadaInicio;
 }

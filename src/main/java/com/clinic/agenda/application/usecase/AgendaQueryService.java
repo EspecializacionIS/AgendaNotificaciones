@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
+
 public class AgendaQueryService implements ListAgendaUseCase, ChangeAgendaStatusUseCase {
 
     private final LoadAgendaPort loadAgendaPort;
